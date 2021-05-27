@@ -1,34 +1,45 @@
 const express = require("express");
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const path = require('path');
+const { sequelize } = require("./models");
+// const session = require("express-session");
 
-const logger = require("morgan");
-const mongoose = require("mongoose");
-const routes = require("./routes")
-const app = express();
 const PORT = process.env.PORT || 3001;
-
-app.use(express.urlencoded({ extended: true }));
+// Sets up the Express App
+// =============================================================
+const app = express();
 app.use(express.json());
 
-app.use(logger("dev"));
-// Serve up static assets (usually on heroku)
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static("client/build"));
+app.use(cors());
+// // Requiring our models for syncing
+
+
+// // Sets up the Express app to handle data parsing
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+// Requiring passport as we've configured it
+// const passport = require("./config/passport");
+
+if (process.env.NODE_ENV === 'production') {
+
+    // Handle React routing, return all requests to React app
+    app.use(express.static(__dirname + '/client/build'));
 }
-// Add routes, both API and view
-app.use(routes);
 
-// Connect to the Mongo DB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/basketball',
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-        useFindAndModify: false
-    }
-);
+// app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
+app.use('/api', require('./routes/api-routes'));
 
-// Start the API server
-app.listen(PORT, function () {
-    console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
+app.get("*", function (req, res) {
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
+
+
+app.listen(PORT, async () => {
+    console.log(`Server up on PORT ${PORT}`);
+    await sequelize.sync();
+    console.log('Database Connected');
+})
