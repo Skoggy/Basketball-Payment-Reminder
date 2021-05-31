@@ -9,14 +9,23 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ Team }) {
       // define association here
+      this.belongsTo(Team, { foreignKey: 'teamId', as: 'team' })
     }
   };
   Player.init({
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: { msg: "Player myst have a name" },
+        notEmpty: { msg: "Player must have a name" }
+      }
     },
 
     email: {
