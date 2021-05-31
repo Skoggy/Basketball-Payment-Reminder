@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { TestGet } from './pages/testGet';
 
 const queryClient = new QueryClient();
 
@@ -6,7 +7,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div>
-        <p>Hey</p>
+        <TestGet></TestGet>
       </div>
     </QueryClientProvider >
   );

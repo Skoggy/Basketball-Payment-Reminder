@@ -8,7 +8,7 @@ const { Player, Team } = require('../models');
 
 router.get('/teams', async (req, res) => {
     try {
-        const teams = await Team.findAll()
+        const teams = await Team.findAll(({ include: 'player' }))
         return res.json(teams)
     } catch (err) {
         console.log(err)
@@ -46,9 +46,11 @@ router.get('/players', async (req, res) => {
 // CREATE new Player
 
 router.post('/players', async (req, res) => {
-    const { name, email } = req.body
+    const { teamUuid, name, email } = req.body
     try {
-        const player = await Player.create({ name, email })
+        const team = await Team.findOne({ where: { uuid: teamUuid } })
+
+        const player = await Player.create({ name, email, teamId: team.id })
         return res.json(player)
     } catch (err) {
         console.log(err)
