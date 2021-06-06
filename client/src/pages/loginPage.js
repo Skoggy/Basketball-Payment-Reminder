@@ -1,14 +1,14 @@
 import React from 'react';
-import axios from 'axios';
-import { useQuery } from 'react-query';
+import Login from '../components/Login';
 
 
 export default function loginPage() {
 
 
+
     return (
         <div>
-            <p>This is the login page</p>
+            <Login />
         </div>
     )
 }
