@@ -23,6 +23,9 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      amountOwed: {
+        type: DataTypes.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE
