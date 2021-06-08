@@ -24,8 +24,7 @@ export default function Login() {
     console.log(selectedTeam)
     const { isLoading, error, data } = useQuery('teams', () =>
         axios('http://localhost:3001/api/teams'))
-    // console.log(data.data)
-
+    console.log(data)
     if (isLoading) return "Loading...";
 
     if (error) return "An error has occured: " + error.message;
@@ -50,6 +49,17 @@ export default function Login() {
                 >
                     {team.name}
                 </TeamStyles>)}
+
+                {selectedTeam.length === 0
+                    ?
+                    <div></div>
+                    :
+                    <div>
+                        {selectedTeam.players.map(player =>
+                            <p key={player.uuid}>{player.name}</p>
+                        )}
+                    </div>
+                }
             </div>
 
 
