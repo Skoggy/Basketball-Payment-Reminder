@@ -46,11 +46,11 @@ router.get('/players', async (req, res) => {
 // CREATE new Player
 
 router.post('/players', async (req, res) => {
-    const { teamUuid, name, email } = req.body
+    const { teamId, name, email, amountOwed } = req.body
     try {
-        const team = await Team.findOne({ where: { uuid: teamUuid } })
+        const team = await Team.findOne({ where: { id: teamId } })
 
-        const player = await Player.create({ name, email, teamId: team.id })
+        const player = await Player.create({ name, email, amountOwed, teamId: team.id })
         return res.json(player)
     } catch (err) {
         console.log(err)

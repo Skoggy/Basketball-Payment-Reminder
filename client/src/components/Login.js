@@ -18,8 +18,19 @@ export default function Login() {
 
     const [selectedTeam, setSelectedTeam] = useState({
         name: '',
-        players: []
+        players: [],
+        teamId: ''
     })
+
+    const [newPlayerInput, setNewPlayerInput] = useState({
+        name: '',
+        email: '',
+        amountOwed: 0,
+        uuid: ''
+    })
+
+    const [newPlayerDisplay, setNewPlayerDisplay] = useState(false);
+    const [displayPlayersBoolean, setDisplayPlayersBoolean] = useState(false);
 
     console.log(selectedTeam)
     const { isLoading, error, data } = useQuery('teams', () =>
@@ -33,8 +44,28 @@ export default function Login() {
         setSelectedTeam({
             ...selectedTeam,
             name: team.name,
-            players: team.player
+            players: team.player,
+            teamId: team.id,
         })
+        setDisplayPlayersBoolean(true)
+    }
+
+    const createPlayer = (e) => {
+        e.preventDefault();
+        const data = {
+            name: newPlayerInput.name,
+            email: newPlayerInput.email,
+            amountOwed: newPlayerInput.amountOwed,
+            teamId: selectedTeam.teamId
+        }
+        axios.post('http://localhost:3001/api/players', data).then((result) => {
+            console.log(result, 'new player Added')
+
+        })
+    }
+
+    const onChangeInput = (e) => {
+        setNewPlayerInput({ ...newPlayerInput, [e.target.name]: e.target.value })
     }
 
 
@@ -50,14 +81,38 @@ export default function Login() {
                     {team.name}
                 </TeamStyles>)}
 
-                {selectedTeam.length === 0
+                {displayPlayersBoolean === false
                     ?
-                    <div></div>
+                    <div>Please Select your Team</div>
                     :
                     <div>
                         {selectedTeam.players.map(player =>
                             <p key={player.uuid}>{player.name}</p>
                         )}
+                        <TeamStyles onClick={(e) => setNewPlayerDisplay(true)}>Add New Player</TeamStyles>
+                    </div>
+                }
+                {newPlayerDisplay === false
+                    ?
+                    <div></div>
+                    :
+                    <div>
+                        <label>Name</label>
+                        <input type='text'
+                            name='name'
+                            id="Name"
+                            placeholder='Name'
+                            value={newPlayerInput.name}
+                            onChange={onChangeInput} />
+                        <label>email</label>
+                        <input type='text'
+                            name='email'
+                            id="Email"
+                            placeholder='Email'
+                            value={newPlayerInput.email}
+                            onChange={onChangeInput} />
+
+                        <button type="submit" onClick={(e) => createPlayer(e)}>Submit</button>
                     </div>
                 }
             </div>
