@@ -58,5 +58,24 @@ router.post('/players', async (req, res) => {
     }
 })
 
+// Take and add to value that each player owes
+router.put('/players/:uuid', async (req, res) => {
+    const uuid = req.params.uuid;
+    const { amountOwed } = req.body;
+
+    try {
+        const player = await Player.findOne({
+            where: { uuid }
+        })
+        player.amountOwed = amountOwed;
+
+        await player.save();
+        return res.json()
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ err: 'Something went wrong' })
+    }
+})
+
 
 module.exports = router;

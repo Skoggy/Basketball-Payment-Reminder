@@ -16,6 +16,13 @@ const TeamStyles = styled.button`
 
 export default function Login() {
 
+    const playerUrl = 'http://localhost:3001/api/players'
+
+    const [amountOwed, setAmountOwed] = useState({
+        uuid: '',
+        amount: '',
+    })
+
     const [selectedTeam, setSelectedTeam] = useState({
         name: '',
         players: [],
@@ -29,13 +36,22 @@ export default function Login() {
         uuid: ''
     })
 
+    const [selectedPlayer, setSelectedPlayer] = useState({
+        name: '',
+        email: '',
+        amountOwed: 0,
+        uuid: ''
+    })
+
+    console.log(selectedPlayer)
+
     const [newPlayerDisplay, setNewPlayerDisplay] = useState(false);
     const [displayPlayersBoolean, setDisplayPlayersBoolean] = useState(false);
 
-    console.log(selectedTeam)
+    // console.log(selectedTeam)
     const { isLoading, error, data } = useQuery('teams', () =>
         axios('http://localhost:3001/api/teams'))
-    console.log(data)
+    // console.log(data)
     if (isLoading) return "Loading...";
 
     if (error) return "An error has occured: " + error.message;
@@ -68,7 +84,23 @@ export default function Login() {
         setNewPlayerInput({ ...newPlayerInput, [e.target.name]: e.target.value })
     }
 
+    // takes what is put in the amount to be updated.
+    const onAmountChange = (e) => {
+        e.persist();
+        setAmountOwed({ ...amountOwed, amount: e.target.value })
+    }
 
+    const updateAmountOwed = (e) => {
+        e.preventDefault();
+        const data = selectedPlayer.uuid;
+        const amount = { amountOwed: amountOwed.amount }
+        axios.put(`${playerUrl}/${data}`, amount).then((result) => {
+            console.log(`You have added/subtracted ${amountOwed.amount}`)
+            console.log(result)
+        })
+    }
+
+    console.log(amountOwed.amount)
     return (
         <LoginStyles>
             <h1>Choose Your Team</h1>
@@ -87,8 +119,21 @@ export default function Login() {
                     :
                     <div>
                         {selectedTeam.players.map(player =>
-                            <p key={player.uuid}>{player.name}</p>
+                            <div key={player.uuid}>
+                                <button
+                                    onClick={(e) => setSelectedPlayer(player)}
+                                >{player.name}</button>
+                                <p>{player.amountOwed}</p>
+
+                            </div>
                         )}
+                        <h3>Update what {selectedPlayer.name} owes</h3>
+                        <input type='number'
+                            name='PlayerOwes'
+                            id='PlayerOwes'
+                            value={amountOwed.amount}
+                            onChange={onAmountChange} />
+                        <button onClick={updateAmountOwed}>Update Owed</button>
                         <TeamStyles onClick={(e) => setNewPlayerDisplay(true)}>Add New Player</TeamStyles>
                     </div>
                 }
