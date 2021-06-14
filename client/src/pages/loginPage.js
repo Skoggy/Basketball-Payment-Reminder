@@ -2,13 +2,15 @@ import React from 'react';
 import Login from '../components/Login';
 
 
-export default function loginPage() {
 
+export default function LoginPage() {
 
 
     return (
+
         <div>
             <Login />
         </div>
+
     )
 }

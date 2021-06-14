@@ -43,15 +43,17 @@ export default function Login() {
         uuid: ''
     })
 
-    console.log(selectedPlayer)
+
+
+    // console.log(selectedPlayer)
 
     const [newPlayerDisplay, setNewPlayerDisplay] = useState(false);
     const [displayPlayersBoolean, setDisplayPlayersBoolean] = useState(false);
 
     // console.log(selectedTeam)
-    const { isLoading, error, data } = useQuery('teams', () =>
-        axios('http://localhost:3001/api/teams'))
-    // console.log(data)
+    const { isLoading, error, data, refetch } = useQuery('teams', () =>
+        axios('http://localhost:3001/api/teams',))
+    console.log(data)
     if (isLoading) return "Loading...";
 
     if (error) return "An error has occured: " + error.message;
@@ -93,14 +95,16 @@ export default function Login() {
     const updateAmountOwed = (e) => {
         e.preventDefault();
         const data = selectedPlayer.uuid;
-        const amount = { amountOwed: amountOwed.amount }
+        const amount = { amountOwed: [JSON.parse(selectedPlayer.amountOwed) + JSON.parse(amountOwed.amount)] }
         axios.put(`${playerUrl}/${data}`, amount).then((result) => {
             console.log(`You have added/subtracted ${amountOwed.amount}`)
-            console.log(result)
+            refetch('teams')
+            setAmountOwed({ ...amountOwed, amount: 0 })
+            setSelectedPlayer('')
         })
     }
+    console.log(selectedPlayer.amountOwed + amountOwed.amount)
 
-    console.log(amountOwed.amount)
     return (
         <LoginStyles>
             <h1>Choose Your Team</h1>
@@ -124,6 +128,7 @@ export default function Login() {
                                     onClick={(e) => setSelectedPlayer(player)}
                                 >{player.name}</button>
                                 <p>{player.amountOwed}</p>
+
 
                             </div>
                         )}
