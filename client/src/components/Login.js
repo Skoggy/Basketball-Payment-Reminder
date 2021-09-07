@@ -2,7 +2,7 @@ import { React, useState } from 'react';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import styled from 'styled-components'
-
+import Player from './Player'
 
 const LoginStyles = styled.div`
 display:grid;
@@ -56,9 +56,6 @@ export default function Login() {
             console.log(error)
         }
     }
-
-
-
     // console.log(selectedPlayer)
 
     const [newPlayerDisplay, setNewPlayerDisplay] = useState(false);
@@ -67,10 +64,12 @@ export default function Login() {
     // console.log(selectedTeam)
     const { isLoading, error, data, refetch } = useQuery('teams', () =>
         axios('http://localhost:3001/api/teams',))
-    console.log(data)
+    // console.log(data)
     if (isLoading) return "Loading...";
 
     if (error) return "An error has occured: " + error.message;
+
+    const tradies = data.data[0]
 
     const updateTheTeam = (team) => {
         setSelectedTeam({
@@ -106,18 +105,22 @@ export default function Login() {
         setAmountOwed({ ...amountOwed, amount: e.target.value })
     }
 
+
+
     const updateAmountOwed = (e) => {
         e.preventDefault();
-        const data = selectedPlayer.uuid;
+        const datas = selectedPlayer.uuid;
         const amount = { amountOwed: [JSON.parse(selectedPlayer.amountOwed) + JSON.parse(amountOwed.amount)] }
-        axios.put(`${playerUrl}/${data}`, amount).then((result) => {
+        axios.put(`${playerUrl}/${datas}`, amount).then((result) => {
             console.log(`You have added/subtracted ${amountOwed.amount}`)
             refetch('teams')
             setAmountOwed({ ...amountOwed, amount: 0 })
             setSelectedPlayer('')
+            updateTheTeam(tradies)
         })
+
     }
-    console.log(selectedPlayer.amountOwed + amountOwed.amount)
+    // console.log(selectedPlayer.amountOwed + parseInt(amountOwed.amount))
 
     return (
         <LoginStyles>
@@ -138,12 +141,11 @@ export default function Login() {
                     <div>
                         {selectedTeam.players.map(player =>
                             <div key={player.uuid}>
-                                <button
+                                <Player
+                                    name={player.name}
+                                    ammountOwed={player.amountOwed}
                                     onClick={(e) => setSelectedPlayer(player)}
-                                >{player.name}</button>
-                                <p>{player.amountOwed}</p>
-
-
+                                />
                             </div>
                         )}
                         <h3>Update what {selectedPlayer.name} owes</h3>
